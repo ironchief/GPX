@@ -2339,6 +2339,20 @@ static int pause_at_zpos(Gpx *gpx, float z_positon)
     return end_frame(gpx);
 }
 
+// 159 - Fire inkjet nozzles
+
+static int fire_inkjet(Gpx *gpx, unsigned nozzles)
+{
+    begin_frame(gpx);
+    
+    write_8(gpx, 159);
+    
+    // uint16: nozzle value 12 nozzles with 1 bit for each
+    write_16(gpx, nozzles);
+    
+    return end_frame(gpx);
+}
+
 // COMMAND @ ZPOS FUNCTIONS
 
 // find an existing filament definition
@@ -4580,6 +4594,14 @@ int gpx_convert_line(Gpx *gpx, char *gcode_line)
                 unsigned blink = 0;
                 if(gpx->command.flag & P_IS_SET) blink = (unsigned)gpx->command.p & 0xFF;
                 CALL( set_LED(gpx, red, green, blue, blink) );
+                command_emitted++;
+                break;
+            }
+                // M700 - Fire inkjet nozzles
+            case 700: {
+                unsigned nozzles = 0;
+                if(gpx->command.flag & P_IS_SET) nozzles = (unsigned)gpx->command.p & 0xFF;
+                CALL( fire_inkjet(gpx, nozzles) );
                 command_emitted++;
                 break;
             }
