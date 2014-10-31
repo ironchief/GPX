@@ -1,6 +1,8 @@
 # Declaration of variables
 CC = cc
+CXX = g++
 CC_FLAGS = -w
+CXXFLGS = -00 -g
 L_FLAGS = -lm
 
 # File names
@@ -9,7 +11,9 @@ PLATFORM=osx
 ARCHIVE = gpx-$(PLATFORM)-$(VERSION)
 PREFIX = /usr/local
 SOURCES = $(wildcard *.c)
+SOURCES_CPP = $(wildcard *.cpp)
 OBJECTS = $(SOURCES:.c=.o)
+OBJECTS_CPP = $(SOURCES_CPP:.cpp=.o)
 
 all: gpx
 
@@ -17,15 +21,16 @@ all: gpx
 
 # Main target
 gpx: $(OBJECTS)
-	$(CC) $(L_FLAGS) $(OBJECTS) -o gpx
+	$(CXX) $(L_FLAGS) $(OBJECTS) $(OBJECTS_CPP) -o gpx
 
 # To obtain object files
 %.o: %.c
 	$(CC) -c $(CC_FLAGS) $< -o $@
+	$(CXX)  -c -o helper.o helper.cpp
 
 # To remove generated files
 clean:
-	rm -f gpx $(OBJECTS)
+	rm -f gpx $(OBJECTS) $(OBJECTS_CPP)
 	rm -f $(ARCHIVE).tar.gz
 	rm -f $(ARCHIVE).zip
 	rm -f $(ARCHIVE).dmg

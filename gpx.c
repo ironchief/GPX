@@ -36,6 +36,7 @@
 #include <unistd.h>
 
 #include "gpx.h"
+#include "helper.h"
 
 #define A 0
 #define B 1
@@ -2339,13 +2340,13 @@ static int pause_at_zpos(Gpx *gpx, float z_positon)
     return end_frame(gpx);
 }
 
-// 159 - Fire inkjet nozzles
+// 170 - Fire inkjet nozzles
 
-static int fire_inkjet(Gpx *gpx, unsigned nozzles)
+static int fire_inkjet(Gpx *gpx, short nozzles)
 {
     begin_frame(gpx);
     
-    write_8(gpx, 159);
+    write_8(gpx, 170);
     
     // uint16: nozzle value 12 nozzles with 1 bit for each
     write_16(gpx, nozzles);
@@ -4599,9 +4600,10 @@ int gpx_convert_line(Gpx *gpx, char *gcode_line)
             }
                 // M700 - Fire inkjet nozzles
             case 700: {
-                unsigned nozzles = 0;
-                if(gpx->command.flag & P_IS_SET) nozzles = (unsigned)gpx->command.p & 0xFF;
-                CALL( fire_inkjet(gpx, nozzles) );
+                long long nozzles = 0;
+                if(gpx->command.flag & P_IS_SET) nozzles = (long long)gpx->command.p;
+                short nozzle_bytes = long_to_bitset(nozzles);
+                CALL( fire_inkjet(gpx, nozzle_bytes) );
                 command_emitted++;
                 break;
             }
